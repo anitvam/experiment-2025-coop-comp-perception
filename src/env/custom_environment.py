@@ -2,7 +2,7 @@ from pettingzoo import ParallelEnv
 from gymnasium import spaces
 import numpy as np
 
-from sim.world import World
+from sim.movement import World
 from sim.sensors import visible_agents
 from sim.renderer import Renderer
 
@@ -22,16 +22,6 @@ class CustomEnvironment(ParallelEnv):
         self.world = World(n_agents)
         self.renderer = Renderer(self.world)
 
-        self.action_spaces = { #Deprecated
-            a: spaces.Box(low=-0.1, high=0.1, shape=(2,))
-            for a in self.agents
-        }
-
-        self.observation_spaces = { #Deprecated
-            a: spaces.Box(low=-10, high=10, shape=(n_agents,))
-            for a in self.agents
-        }
-
     def reset(self, seed=None, options=None):
         """Resets the environment to a starting point. Returns a dictionary of observations"""
         self.world = World(self.n_agents)
@@ -48,11 +38,8 @@ class CustomEnvironment(ParallelEnv):
             obs[a] = mask
         return obs
 
-    def step(self, actions):
-        action_array = np.array(
-            [actions[a] for a in self.agents]
-        )
-        self.world.step(action_array)
+    def step(self, dt=0.1, turn_std=0.15):
+        self.world.step(dt, turn_std)
 
         obs = self._observe()
         rewards = {a: 0.0 for a in self.agents}

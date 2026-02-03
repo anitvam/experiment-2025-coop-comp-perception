@@ -2,7 +2,7 @@ import pygame
 import numpy as np
 
 class Renderer:
-    def __init__(self, world, scale=40):
+    def __init__(self, world, scale=30):
         pygame.init()
         self.world = world
         self.scale = scale
@@ -21,7 +21,6 @@ class Renderer:
     def draw_agent(self, i):
         pos = self.world.positions[i]
         heading = self.world.headings[i]
-
         p = self.world_to_screen(pos)
         pygame.draw.circle(self.screen, (0, 0, 255), p, 6)
 
@@ -37,19 +36,28 @@ class Renderer:
 
         # FOV cone
         fov = np.pi / 2
-        for a in np.linspace(-fov / 2, fov / 2, 2):
+        radius = 4.0
+        color = (200, 200, 255, 80)
+
+        surface = pygame.Surface(
+            (self.size, self.size), pygame.SRCALPHA
+        )
+
+        points = [self.world_to_screen(pos)]
+
+        for angle in np.linspace(-fov / 2, fov / 2, 30):
             ray = (
-                pos[0] + 4 * np.cos(heading + a),
-                pos[1] + 4 * np.sin(heading + a),
+                pos[0] + radius * np.cos(heading + angle),
+                pos[1] + radius * np.sin(heading + angle),
             )
-            pygame.draw.line(
-                self.screen, (200, 200, 200),
-                p, self.world_to_screen(ray), 1
-            )
+            points.append(self.world_to_screen(ray))
+
+        pygame.draw.polygon(surface, color, points)
+        self.screen.blit(surface, (0, 0))
 
     def render(self):
         self.screen.fill((255, 255, 255))
-        
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
