@@ -37,7 +37,7 @@ class Renderer:
 
         # FOV cone
         fov = np.pi / 2
-        for a in np.linspace(-fov / 2, fov / 2, 15):
+        for a in np.linspace(-fov / 2, fov / 2, 2):
             ray = (
                 pos[0] + 4 * np.cos(heading + a),
                 pos[1] + 4 * np.sin(heading + a),
@@ -49,6 +49,12 @@ class Renderer:
 
     def render(self):
         self.screen.fill((255, 255, 255))
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                raise SystemExit
+
         for i in range(self.world.n_agents):
             self.draw_agent(i)
         pygame.display.flip()

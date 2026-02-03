@@ -12,4 +12,4 @@ for _ in range(1000):
     }
     obs, _, _, _, _ = env.step(actions)
     env.render()
-    time.sleep(0.03)
+    time.sleep(0.3)
